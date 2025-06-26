@@ -1,4 +1,199 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // GSAP Scroll Animations
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Creative Hero Animation
+    const heroSection = document.querySelector('.hero');
+    const logo = document.querySelector('.header .logo');
+    
+    if (heroSection && logo) {
+        // Get hero elements
+        const heroContainer = heroSection.querySelector('.hero-container');
+        const heroText = heroSection.querySelector('.hero-text');
+        const heroImage = heroSection.querySelector('.hero-image');
+        const h1 = heroSection.querySelector('h1');
+        const h3 = heroSection.querySelector('h3');
+        const h5 = heroSection.querySelector('h5');
+        const bullets = heroSection.querySelector('.bullets');
+        const applyButton = heroSection.querySelector('.apply-button');
+        const sharksVisual = heroSection.querySelector('.sharks-visual');
+        const abcMention = heroSection.querySelector('.abc-mention');
+
+        // Set initial states
+        gsap.set([heroContainer, heroText, heroImage], { opacity: 0 });
+        gsap.set(heroContainer, { scale: 0.2, y: 50, transformOrigin: "center bottom" });
+        gsap.set(heroText, { x: 0 });
+        gsap.set(heroImage, { x: 0, scale: 0.8 });
+        gsap.set([h1, h3, h5, bullets], { opacity: 0, y: 80 });
+        gsap.set(applyButton, { opacity: 0, scale: 0.8, y: 20 });
+        gsap.set(sharksVisual, { opacity: 0, scale: 0.7 });
+        gsap.set(abcMention, { opacity: 0, scale: 0.5, y: 20 });
+        gsap.set(logo, { opacity: 0, y: 60 });
+        // Set logo initial state - perfectly centered in viewport
+
+        // Create timeline for hero animation
+        const heroTl = gsap.timeline({ delay: 0 });
+
+        // Logo animation - fade in and move up
+        heroTl.to(logo, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            delay: 0.5,
+            ease: "power4.out"
+        }, 0);
+
+        // Main container animation
+        heroTl.to(heroContainer, {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 1.5,
+            ease: "power4.out"
+        }, 0);
+
+        // Text and image slide in
+        heroTl.to(heroText, {
+            opacity: 1,
+            x: 0,
+            duration: 1,
+            ease: "power4.out"
+        }, 0.2);
+
+        heroTl.to(heroImage, {
+            opacity: 1,
+            x: 0,
+            scale: 1,
+            duration: 1,
+            ease: "power4.out"
+        }, 0.2);
+
+        // Text elements stagger in
+        heroTl.to(h1, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power4.out"
+        }, 0.3);
+
+        heroTl.to(h3, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power4.out"
+        }, 0.4);
+
+        heroTl.to(h5, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power4.out"
+        }, 0.5);
+
+        heroTl.to(bullets, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power4.out"
+        }, 0.6);
+
+        // Sharks visual animation
+        heroTl.to(sharksVisual, {
+            opacity: 1,
+            scale: 1,
+            duration: 1.2,
+            ease: "power4.out"
+        }, 0.6);
+
+        // ABC mention animation
+        heroTl.to(abcMention, {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power4.out"
+        }, 0.7);
+
+        // Apply button animation
+        heroTl.to(applyButton, {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power4.out"
+        }, 0.8);
+    }
+
+    // Minimal fade-in for all <section> elements only - Fixed to prevent jumping
+    document.querySelectorAll('section:not(.hero)').forEach(section => {
+        // Set initial state without affecting document flow
+        gsap.set(section, { 
+            opacity: 0, 
+            scale: 0.9,
+            transformOrigin: "center center"
+        });
+        
+        gsap.to(section, {
+            scale: 1,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: section,
+                start: "top 80%",
+                toggleActions: "play none none reverse"
+            }
+        });
+    });
+
+    // Combine animation for .step and .box elements since they use the same effect - Fixed to prevent jumping
+    const animatedFlexContainers = [
+        document.querySelector('.steps .flex-container'),
+        document.querySelector('.solutions .flex-container')
+    ];
+    animatedFlexContainers.forEach(flex => {
+        if (flex) {
+            const items = flex.querySelectorAll('.step, .box');
+            const steps = flex.querySelectorAll('.step');
+            const totalSteps = steps.length;
+            
+            // Set initial state without affecting document flow
+            gsap.set(items, { 
+                opacity: 0, 
+                y: 100,
+                scale: 0.95,
+                transformOrigin: "center center"
+            });
+            
+            steps.forEach((step, i) => {
+                step.style.zIndex = totalSteps - i;
+            });
+            
+            gsap.to(items, {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 1,
+                ease: "power3.out",
+                stagger: {
+                    amount: 0.3,
+                    onStart: function(index, target, targets) {
+                        if (target.classList.contains('step')) {
+                            // Set z-index so first is on top, last is at the bottom (redundant, but safe)
+                            target.style.zIndex = totalSteps - Array.from(steps).indexOf(target);
+                        }
+                        // Do not change z-index for .box
+                    }
+                },
+                scrollTrigger: {
+                    trigger: flex,
+                    start: "top 90%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+        }
+    });
+
     // Industry Button Logic
     const industryButtons = document.querySelectorAll('.industry-button');
     const imageContainer = document.querySelector('.industries-image-container');
@@ -48,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     newImage.style.zIndex = '';
                     isAnimating = false;
-                }, 400); 
+                }, 200); 
             };
 
             // Handle images that fail to load
@@ -78,11 +273,12 @@ document.addEventListener('DOMContentLoaded', function () {
             duration: 0.7,
           });
 
-          function raf(time) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
-          }
-          requestAnimationFrame(raf);
+          // Integrate Lenis with GSAP ScrollTrigger
+          lenis.on("scroll", ScrollTrigger.update);
+
+          gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+          });
 
           // Ensure video triggers are set up only after Lenis is ready
           setupVideoOverlayTrigger();
