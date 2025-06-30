@@ -567,9 +567,8 @@ document.addEventListener('DOMContentLoaded', function () {
           sliders.push(new DragScroll(sliderElement, ".slider-wrapper", ".slider-item"));
         });
 
-        // Add navigation arrows to each .slider (desktop only)
-        if (window.innerWidth > 768) {
-          document.querySelectorAll('.slider').forEach((sliderElement, sliderIndex) => {
+        // Add navigation arrows to each .slider (always, no conditions)
+        document.querySelectorAll('.slider').forEach((sliderElement, sliderIndex) => {
             const sliderWrapper = sliderElement.querySelector('.slider-wrapper');
             const sliderItems = sliderElement.querySelectorAll('.slider-item');
             if (!sliderWrapper || sliderItems.length < 2) return;
@@ -635,8 +634,7 @@ document.addEventListener('DOMContentLoaded', function () {
               const next = Math.min(sliderItems.length - 1, current + 1);
               scrollToIndex(next);
             });
-          });
-        }
+        });
     }
 
     // Initialize everything in the correct order
