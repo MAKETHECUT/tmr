@@ -1,3 +1,21 @@
+// Prevent content flicker by hiding page until GSAP is ready
+(function() {
+    // Hide the entire page content immediately
+    const style = document.createElement('style');
+    style.textContent = `
+        body { 
+            opacity: 0 !important; 
+            visibility: hidden !important; 
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        body.gsap-ready { 
+            opacity: 1 !important; 
+            visibility: visible !important; 
+        }
+    `;
+    document.head.appendChild(style);
+})();
+
 document.addEventListener('DOMContentLoaded', function () {
     // GSAP Scroll Animations
     gsap.registerPlugin(ScrollTrigger);
@@ -640,6 +658,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize everything in the correct order
     initSmoothScroll();
     initSliderGallery();
+    initHomeVideo();
+
+    // Show the page content after everything is initialized
+    // Use a small delay to ensure all GSAP animations are properly set up
+    setTimeout(() => {
+        document.body.classList.add('gsap-ready');
+    }, 100);
 
     const slider = document.getElementById('funding-slider');
     const amountSpan = document.getElementById('funding-amount');
@@ -859,4 +884,3 @@ function initHomeVideo() {
   
     setupCustomVideoPlayer();
   }
-  initHomeVideo();
