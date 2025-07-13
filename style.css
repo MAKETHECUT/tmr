@@ -423,19 +423,24 @@ section:not(.hero) {
 .header {
 	width: var(--desktop-width);
     margin: auto!important;
-    position: absolute;
-    top: 3vw;
-    left: 50%;
-    transform: translate(-50%, -0%);
+    display: flex;
+    justify-content: space-between;
+    top: 0vw;
+    background: var(--creme);
 	z-index: 999;
 	pointer-events: unset;
+    padding-top: 2vw;
+    padding-bottom: 1.5vw;
 }
-/*
-.header.scroll {
-	top: -10vw;
-	transition: top 0.8s cubic-bezier(.22, .19, 0, .99);
+
+.header .cta-flex {
+    display: flex;
+    grid-gap: 1.5vw;
 }
-*/
+
+.header .cta-flex .icon {
+    width: 5.5vw;
+}
 
 .header .logo {
 	overflow: hidden;
@@ -459,10 +464,31 @@ section:not(.hero) {
 @media (max-width: 650px) {
     .header {
         width: var(--mobile-width);
-        top: 6vw;
+        top: 0vw;
+        padding-top: 5vw;
+        padding-bottom: 5vw;
+    }
+    .header .cta-flex {
+        display: flex;
+        grid-gap: 8vw;
+    }
+    
+    .header .cta-flex .icon {
+        width: 16vw;
+    }
+    .header .logo {
+        top: 1vw;
+        position: relative;
+    }
+    .header .button { 
+        width: auto;
+        position: relative;
+        right: 6vw;
+        font-size: 3.5vw;
+        padding: 2.8vw 3vw;
     }
     .logo img {
-        width: 35vw;
+        width: 30vw;
         margin-left: 6vw;
     }
 }
@@ -647,7 +673,7 @@ section:not(.hero) {
 
 @media (max-width: 650px) {
     .hero .hero-container {
-        margin-top: 18vw;
+        margin-top: 20vw;
         padding: 6vw;
         border-radius: 3vw;
         flex-direction: column;
@@ -723,12 +749,11 @@ section:not(.hero) {
 
     .apply-button {
         border-radius: 3vw;
-        padding: 4vw 6vw;
+        padding: 3vw 4vw;
         height: auto;
         min-height: 15vw;
-        grid-gap: 4vw;
-        width: 100%;
-        max-width: 80vw;
+        grid-gap: 2vw;
+
     }
 
     .apply-button h4 {
@@ -746,7 +771,7 @@ section:not(.hero) {
     }
 
     .apply-button .button-icon img {
-        width: 8vw;
+        min-width: 10vw;
         border: 0.4vw solid var(--orange);
     }
 
@@ -979,6 +1004,21 @@ section:not(.hero) h4 {
     transform: translate(-50%, -50%);
     z-index: 10;
     cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.play-button:hover {
+    opacity: 0.5;
+}
+
+.hero .play-button {
+    width: 5vw;
+}
+
+@media (max-width: 650px) {
+    .hero .play-button {
+        width: 18vw;
+    }
 }
 
 .video-overlay {
@@ -1658,8 +1698,8 @@ section.steps .flex-container .step:nth-of-type(4) {
     justify-content: start;
 }
 
-.footer .contact-info .buttons .button {
-    display: flex;
+.button {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     grid-gap: 0.8vw;
@@ -1673,11 +1713,11 @@ section.steps .flex-container .step:nth-of-type(4) {
     transition: background 0.3s ease;
 }
 
-.footer .contact-info .buttons .button:hover {
+.button:hover {
     background: var(--white);
 }
 
-.footer .contact-info .buttons .button img {
+.button img {
     width: 1.1vw;
 }
 
@@ -2167,19 +2207,19 @@ section.steps .flex-container .step:nth-of-type(4) {
     }
     .footer .contact-info .buttons {
         grid-gap: 3vw;
-        font-size: 4vw;
         justify-content: space-between;
     }
-    .footer .contact-info .buttons .button {
+    .button {
         grid-gap: 2vw;
         border-radius: 2vw;
         padding: 4vw;
+        font-size: 4vw;
         height: auto;
         min-height: 8vw;
         width: 100%;
         border-width: 0.3vw;
     }
-    .footer .contact-info .buttons .button img {
+    .button img {
         width: 3vw;
     }
     .footer .contact-info .locations {
