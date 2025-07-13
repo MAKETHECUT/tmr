@@ -1,3 +1,12 @@
+window.history.scrollRestoration = "manual";
+
+window.addEventListener("beforeunload", () => {
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+});
+
+
 // Prevent content flicker by hiding page until GSAP is ready
 (function() {
     // Hide the entire page content immediately
@@ -884,3 +893,133 @@ function initHomeVideo() {
   
     setupCustomVideoPlayer();
   }
+
+
+
+
+/* ==============================================
+Navbar Show/Hide 
+============================================== */
+
+function initNavbarShowHide() {
+    // Kill any existing instance
+    if (window.navbarShowHide && typeof window.navbarShowHide.destroy === 'function') {
+        window.navbarShowHide.destroy();
+    }
+
+    const navElements = document.querySelectorAll(".header");
+    let lastScrollTop = 0;
+    const isMobile = window.innerWidth < 650;
+    const hideY = isMobile ? "-20vw" : "-8vw";
+    let hasScrolledDown = false;
+    let scrollHandler = null;
+
+    if (navElements.length) {
+        // Force scroll to top immediately
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+
+        // Reset any existing animations
+        navElements.forEach((nav) => {
+            gsap.killTweensOf(nav);
+        });
+
+        // Set initial position without animation
+        navElements.forEach((nav) => {
+            gsap.set(nav, { 
+                y: 0, 
+                position: "fixed", 
+                top: 0, 
+                left: 0, 
+                right: 0, 
+                zIndex: 999,
+                clearProps: "transform" // Clear any existing transforms
+            });
+        });
+
+        lastScrollTop = 0;
+        hasScrolledDown = false;
+
+        // Remove any existing scroll handler
+        if (window.navbarScrollHandler) {
+            window.removeEventListener("scroll", window.navbarScrollHandler);
+        }
+
+        // Create new scroll handler
+        scrollHandler = function() {
+            const st = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollDelta = st - lastScrollTop;
+
+            // Reset hasScrolledDown if we're at the top
+            if (st === 0) {
+                hasScrolledDown = false;
+                navElements.forEach((nav) => {
+                    gsap.set(nav, { y: 0 });
+                });
+                return;
+            }
+
+            if (!hasScrolledDown && st > 0) {
+                hasScrolledDown = true;
+            }
+
+            if (!hasScrolledDown || st < 100) return;
+
+            if (st > lastScrollTop) {
+                // Scrolling down - hide navbar
+                navElements.forEach((nav) => {
+                    gsap.to(nav, { 
+                        y: hideY, 
+                        duration: 1, 
+                        ease: "power4.out",
+                        overwrite: true // Ensure smooth transitions
+                    });
+                });
+            } else if (st < lastScrollTop && Math.abs(scrollDelta) > 1) {
+                // Scrolling up - only show navbar if scroll delta is significant
+                navElements.forEach((nav) => {
+                    gsap.to(nav, { 
+                        y: "0vw", 
+                        duration: 1, 
+                        ease: "power4.out",
+                        overwrite: true // Ensure smooth transitions
+                    });
+                });
+            }
+
+            lastScrollTop = Math.max(0, st);
+        };
+
+        // Store the handler reference globally
+        window.navbarScrollHandler = scrollHandler;
+        window.addEventListener("scroll", scrollHandler);
+
+        // Force initial position
+        requestAnimationFrame(() => {
+            navElements.forEach((nav) => {
+                gsap.set(nav, { y: 0 });
+            });
+        });
+    }
+
+    // Create and store the instance
+    window.navbarShowHide = {
+        destroy: function() {
+            if (window.navbarScrollHandler) {
+                window.removeEventListener("scroll", window.navbarScrollHandler);
+                window.navbarScrollHandler = null;
+            }
+            // Reset GSAP animations
+            navElements.forEach((nav) => {
+                gsap.killTweensOf(nav);
+                gsap.set(nav, { clearProps: "all" });
+            });
+        }
+    };
+
+    return window.navbarShowHide;
+}
+  
+
+initNavbarShowHide();
