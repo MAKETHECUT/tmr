@@ -1561,10 +1561,11 @@ padding: 2vw;
         min-height: unset!important;
     }
     .slider-container {
-        min-height: unset!important;
         max-height: unset!important;
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
+        min-height: 100vh;
     }
     .slider-banner {
         display: none;
@@ -1617,7 +1618,7 @@ padding: 2vw;
     .slide-bottom {
         flex-direction: column;
         grid-gap: 4vw;
-        position: absolute;
+        position: relative;
         bottom: 0;
         right: 0;
         width: 100%;
