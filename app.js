@@ -1,6 +1,10 @@
 // Slide navigation logic for the multi-step form
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Disable all custom select search inputs to prevent them from being submitted
+    document.querySelectorAll('.custom-select__search').forEach(function(input) {
+      input.disabled = true;
+    });
     // Slide 1 to Slide 2
     var startBtn = document.getElementById('start-application-btn');
     if (startBtn) {
