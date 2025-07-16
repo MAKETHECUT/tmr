@@ -706,3 +706,89 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   
   });
+
+
+// Testimonials Slider Functionality
+
+document.addEventListener('DOMContentLoaded', function() {
+    const testimonialsSlider = document.querySelector('.testimonials-slider');
+    
+    if (testimonialsSlider) {
+        const testimonials = testimonialsSlider.querySelectorAll('.testimonial');
+        let currentIndex = 0;
+        const intervalTime = 5000; // 4 seconds between each testimonial
+        
+        // Function to show a specific testimonial
+        function showTestimonial(index) {
+            // Find current active testimonial
+            const currentActive = testimonialsSlider.querySelector('.testimonial.active');
+            
+            if (currentActive) {
+                // Add exit animation to current testimonial
+                currentActive.classList.add('exit');
+                
+                // Remove exit class after animation completes
+                setTimeout(() => {
+                    currentActive.classList.remove('active', 'exit');
+                }, 1200); // Full transition time
+            }
+            
+            // Add active class to new testimonial immediately
+            testimonials.forEach(testimonial => {
+                testimonial.classList.remove('active', 'exit');
+            });
+            
+            if (testimonials[index]) {
+                testimonials[index].classList.add('active');
+            }
+        }
+        
+        // Function to go to next testimonial
+        function nextTestimonial() {
+            currentIndex = (currentIndex + 1) % testimonials.length;
+            showTestimonial(currentIndex);
+        }
+        
+        // Function to go to previous testimonial
+        function previousTestimonial() {
+            currentIndex = (currentIndex - 1 + testimonials.length) % testimonials.length;
+            showTestimonial(currentIndex);
+        }
+        
+        // Initialize the slider
+        function initSlider() {
+            if (testimonials.length > 0) {
+                // Show the first testimonial
+                showTestimonial(0);
+                
+                // Start the automatic rotation
+                setInterval(nextTestimonial, intervalTime);
+            }
+        }
+        
+        // Initialize the slider
+        initSlider();
+        
+        // Optional: Add pause on hover functionality
+        let intervalId;
+        
+        function startAutoRotation() {
+            intervalId = setInterval(nextTestimonial, intervalTime);
+        }
+        
+        function stopAutoRotation() {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        }
+        
+        // Pause on hover (optional - uncomment if you want this feature)
+        /*
+        testimonialsSlider.addEventListener('mouseenter', stopAutoRotation);
+        testimonialsSlider.addEventListener('mouseleave', startAutoRotation);
+        */
+        
+        // Start the automatic rotation
+        startAutoRotation();
+    }
+});
