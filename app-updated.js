@@ -754,16 +754,7 @@ document.addEventListener('DOMContentLoaded', function() {
           return;
         }
         
-        // Enforce at least one loan-purpose checkbox is selected
-        const loanPurposeCheckboxes = document.querySelectorAll('input[name="loan-purpose[]"]');
-        const anyChecked = Array.from(loanPurposeCheckboxes).some(cb => cb.checked);
-        if (!anyChecked) {
-          e.preventDefault();
-          alert('Please select at least one purpose for your loan.');
-          // Optionally, navigate back to the loan purpose slide
-          showSlideAnimated(4); // Slide 5 is index 4 (0-based)
-          return;
-        }
+
         
         // Debug: Log form data before submission
         const form = document.querySelector('form');
