@@ -522,9 +522,23 @@ document.addEventListener('DOMContentLoaded', function() {
     firstNameInput.addEventListener('input', function() {
       hideErrorBar();
     });
+    // Handle auto-fill
+    firstNameInput.addEventListener('change', function() {
+      hideErrorBar();
+    });
+    firstNameInput.addEventListener('blur', function() {
+      hideErrorBar();
+    });
   }
   if (lastNameInput) {
     lastNameInput.addEventListener('input', function() {
+      hideErrorBar();
+    });
+    // Handle auto-fill
+    lastNameInput.addEventListener('change', function() {
+      hideErrorBar();
+    });
+    lastNameInput.addEventListener('blur', function() {
       hideErrorBar();
     });
   }
@@ -532,9 +546,25 @@ document.addEventListener('DOMContentLoaded', function() {
     emailInput.addEventListener('input', function() {
       hideErrorBar();
     });
+    // Handle auto-fill
+    emailInput.addEventListener('change', function() {
+      hideErrorBar();
+    });
+    emailInput.addEventListener('blur', function() {
+      hideErrorBar();
+    });
   }
   if (phoneInput) {
     phoneInput.addEventListener('input', function() {
+      formatUSPhoneNumber(phoneInput);
+      hideErrorBar();
+    });
+    // Handle auto-fill
+    phoneInput.addEventListener('change', function() {
+      formatUSPhoneNumber(phoneInput);
+      hideErrorBar();
+    });
+    phoneInput.addEventListener('blur', function() {
       formatUSPhoneNumber(phoneInput);
       hideErrorBar();
     });
@@ -546,6 +576,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   if (businessNameInput) {
     businessNameInput.addEventListener('input', function() {
+      hideErrorBar();
+    });
+    // Handle auto-fill
+    businessNameInput.addEventListener('change', function() {
+      hideErrorBar();
+    });
+    businessNameInput.addEventListener('blur', function() {
       hideErrorBar();
     });
   }
@@ -561,6 +598,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   if (loanAmountInput) {
     loanAmountInput.addEventListener('input', function() {
+      hideErrorBar();
+    });
+    // Handle auto-fill
+    loanAmountInput.addEventListener('change', function() {
+      hideErrorBar();
+    });
+    loanAmountInput.addEventListener('blur', function() {
       hideErrorBar();
     });
   }
@@ -810,6 +854,53 @@ document.addEventListener('DOMContentLoaded', function() {
     var digits = phone.replace(/\D/g, '');
     return digits.length === 10;
   }
+
+  // Auto-fill detection and handling
+  function setupAutoFillDetection() {
+    // Monitor for auto-fill events
+    const inputs = [firstNameInput, lastNameInput, emailInput, phoneInput, businessNameInput, loanAmountInput];
+    
+    inputs.forEach(input => {
+      if (input) {
+        // Check for auto-fill on animation start (Chrome/Safari)
+        input.addEventListener('animationstart', function(e) {
+          if (e.animationName === 'onAutoFillStart') {
+            hideErrorBar();
+          }
+        });
+        
+        // Check for auto-fill on animation end (Chrome/Safari)
+        input.addEventListener('animationend', function(e) {
+          if (e.animationName === 'onAutoFillCancel') {
+            hideErrorBar();
+          }
+        });
+        
+        // Monitor for value changes (Firefox/Edge)
+        let lastValue = input.value;
+        const checkAutoFill = () => {
+          if (input.value !== lastValue) {
+            lastValue = input.value;
+            hideErrorBar();
+            // Format phone number if it's the phone input
+            if (input === phoneInput) {
+              formatUSPhoneNumber(phoneInput);
+            }
+          }
+        };
+        
+        // Check periodically for auto-fill
+        setInterval(checkAutoFill, 100);
+        
+        // Also check on focus/blur events
+        input.addEventListener('focus', checkAutoFill);
+        input.addEventListener('blur', checkAutoFill);
+      }
+    });
+  }
+  
+  // Initialize auto-fill detection
+  setupAutoFillDetection();
 
   // --- Privacy Policy Approval Notification on Form Submit ---
   var form = document.querySelector('form');
