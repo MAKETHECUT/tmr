@@ -834,44 +834,19 @@ document.addEventListener('DOMContentLoaded', function() {
   // --- Privacy Policy Approval Notification on Form Submit ---
   var form = document.querySelector('form');
   if (form) {
-    // Function to update redirect URL based on form answers
-    function updateRedirectUrl() {
+    // Function to determine redirect URL based on form answers
+    function getRedirectUrl() {
       const businessTimeline = form.querySelector('input[name="business-timeline"]:checked');
       const businessRevenue = form.querySelector('input[name="business-revenue"]:checked');
       
       const isLessThan4Months = businessTimeline && businessTimeline.value === 'Less than 4 months';
       const isRevenue5000To15000 = businessRevenue && businessRevenue.value === '$5,000-$15,000';
       
-      let redirectUrl = '/thank-you';
       if (isLessThan4Months || isRevenue5000To15000) {
-        redirectUrl = '/thank-you-under';
+        return '/thank-you-under';
       }
-      
-      form.setAttribute('redirect', redirectUrl);
-      form.setAttribute('data-redirect', redirectUrl);
-      
-      // Also try setting it as a property in case Webflow reads it that way
-      if (form.redirect !== undefined) {
-        form.redirect = redirectUrl;
-      }
-      if (form.dataset && form.dataset.redirect !== undefined) {
-        form.dataset.redirect = redirectUrl;
-      }
-      
-      return redirectUrl;
+      return '/thank-you';
     }
-    
-    // Update redirect whenever radio buttons change (so it's always current)
-    const timelineRadios = form.querySelectorAll('input[name="business-timeline"]');
-    const revenueRadios = form.querySelectorAll('input[name="business-revenue"]');
-    
-    timelineRadios.forEach(function(radio) {
-      radio.addEventListener('change', updateRedirectUrl);
-    });
-    
-    revenueRadios.forEach(function(radio) {
-      radio.addEventListener('change', updateRedirectUrl);
-    });
     
     form.addEventListener('submit', function(e) {
       if (privacyCheckbox && !privacyCheckbox.checked) {
@@ -880,8 +855,61 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      // Update redirect URL right before submission
-      updateRedirectUrl();
+      // Determine the correct redirect URL
+      const redirectUrl = getRedirectUrl();
+      
+      // Prevent default to handle submission ourselves
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Build query string from all form data
+      const formData = new FormData(form);
+      const params = new URLSearchParams();
+      
+      for (const [key, value] of formData.entries()) {
+        if (value) {
+          params.append(key, value);
+        }
+      }
+      
+      // Get current page URL for form submission
+      const currentPath = window.location.pathname;
+      const submitUrl = currentPath + '?' + params.toString();
+      
+      // Create a hidden iframe to submit the form (this ensures Webflow processes it)
+      const iframe = document.createElement('iframe');
+      iframe.name = 'webflow-form-frame';
+      iframe.style.display = 'none';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      document.body.appendChild(iframe);
+      
+      // Create a temporary form to submit in the iframe
+      const tempForm = document.createElement('form');
+      tempForm.method = 'get';
+      tempForm.action = submitUrl;
+      tempForm.target = 'webflow-form-frame';
+      tempForm.style.display = 'none';
+      document.body.appendChild(tempForm);
+      
+      // Submit the form
+      tempForm.submit();
+      
+      // Immediately redirect to the correct thank-you page
+      // This happens before Webflow's server-side redirect
+      setTimeout(function() {
+        window.location.href = redirectUrl;
+      }, 100);
+      
+      // Clean up after redirect
+      setTimeout(function() {
+        if (tempForm.parentNode) {
+          tempForm.parentNode.removeChild(tempForm);
+        }
+        if (iframe.parentNode) {
+          iframe.parentNode.removeChild(iframe);
+        }
+      }, 2000);
     });
   }
 
