@@ -68,7 +68,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (slideNumber !== null && slideNumber < slides.length) {
         e.preventDefault();
         showSlideAnimated(slideNumber);
-        console.log('Navigated to slide ' + (slideNumber + 1));
       }
     }
   });
@@ -276,12 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const checkboxes2 = document.querySelectorAll('#slide-5 .services-grid input[type="checkbox"]');
     const allCheckboxes = [...checkboxes1, ...checkboxes2];
     
-    console.log('Slide 5 validation - Found checkboxes:', allCheckboxes.length);
-    console.log('Checkboxes in buttons-wrap:', checkboxes1.length);
-    console.log('Checkboxes in services-grid:', checkboxes2.length);
-    
     const anySelected = allCheckboxes.some(checkbox => checkbox.checked);
-    console.log('Any selected:', anySelected);
     
     if (!anySelected) {
       showErrorBar('Please select at least one option to continue');
@@ -720,25 +714,6 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         return;
       }
-      
-      // Debug: Log form data before submission
-      const form = document.querySelector('form');
-      if (form) {
-        const formData = new FormData(form);
-        console.log('=== FORM SUBMISSION DEBUG ===');
-        console.log('All form data:');
-        for (let [key, value] of formData.entries()) {
-          console.log(key + ': ' + value);
-        }
-        // Check checkboxes specifically
-        const checkboxes = form.querySelectorAll('input[type="checkbox"]:checked');
-        console.log('Checked checkboxes:', checkboxes.length);
-        checkboxes.forEach(function(cb) {
-          console.log('Checkbox:', cb.name, '=', cb.value);
-        });
-      }
-      // Let the form submit naturally - don't prevent default
-      console.log('Form submitted!');
     });
   }
 
@@ -846,6 +821,21 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         alert('please approve privacy policy in order to apply');
         return;
+      }
+      
+      // Check for conditional redirect based on form answers
+      const businessTimeline = form.querySelector('input[name="business-timeline"]:checked');
+      const businessRevenue = form.querySelector('input[name="business-revenue"]:checked');
+      
+      const isLessThan4Months = businessTimeline && businessTimeline.value === 'Less than 4 months';
+      const isRevenue5000To15000 = businessRevenue && businessRevenue.value === '$5,000-$15,000';
+      
+      if (isLessThan4Months || isRevenue5000To15000) {
+        form.setAttribute('redirect', '/thank-you-under');
+        form.setAttribute('data-redirect', '/thank-you-under');
+      } else {
+        form.setAttribute('redirect', '/thank-you');
+        form.setAttribute('data-redirect', '/thank-you');
       }
     });
   }
