@@ -714,6 +714,24 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         return;
       }
+      
+      // Set redirect URL early, before form submission
+      const form = document.querySelector('form');
+      if (form) {
+        const businessTimeline = form.querySelector('input[name="business-timeline"]:checked');
+        const businessRevenue = form.querySelector('input[name="business-revenue"]:checked');
+        
+        const isLessThan4Months = businessTimeline && businessTimeline.value === 'Less than 4 months';
+        const isRevenue5000To15000 = businessRevenue && businessRevenue.value === '$5,000-$15,000';
+        
+        let redirectUrl = '/thank-you';
+        if (isLessThan4Months || isRevenue5000To15000) {
+          redirectUrl = '/thank-you-under';
+        }
+        
+        form.setAttribute('redirect', redirectUrl);
+        form.setAttribute('data-redirect', redirectUrl);
+      }
     });
   }
 
@@ -816,6 +834,45 @@ document.addEventListener('DOMContentLoaded', function() {
   // --- Privacy Policy Approval Notification on Form Submit ---
   var form = document.querySelector('form');
   if (form) {
+    // Function to update redirect URL based on form answers
+    function updateRedirectUrl() {
+      const businessTimeline = form.querySelector('input[name="business-timeline"]:checked');
+      const businessRevenue = form.querySelector('input[name="business-revenue"]:checked');
+      
+      const isLessThan4Months = businessTimeline && businessTimeline.value === 'Less than 4 months';
+      const isRevenue5000To15000 = businessRevenue && businessRevenue.value === '$5,000-$15,000';
+      
+      let redirectUrl = '/thank-you';
+      if (isLessThan4Months || isRevenue5000To15000) {
+        redirectUrl = '/thank-you-under';
+      }
+      
+      form.setAttribute('redirect', redirectUrl);
+      form.setAttribute('data-redirect', redirectUrl);
+      
+      // Also try setting it as a property in case Webflow reads it that way
+      if (form.redirect !== undefined) {
+        form.redirect = redirectUrl;
+      }
+      if (form.dataset && form.dataset.redirect !== undefined) {
+        form.dataset.redirect = redirectUrl;
+      }
+      
+      return redirectUrl;
+    }
+    
+    // Update redirect whenever radio buttons change (so it's always current)
+    const timelineRadios = form.querySelectorAll('input[name="business-timeline"]');
+    const revenueRadios = form.querySelectorAll('input[name="business-revenue"]');
+    
+    timelineRadios.forEach(function(radio) {
+      radio.addEventListener('change', updateRedirectUrl);
+    });
+    
+    revenueRadios.forEach(function(radio) {
+      radio.addEventListener('change', updateRedirectUrl);
+    });
+    
     form.addEventListener('submit', function(e) {
       if (privacyCheckbox && !privacyCheckbox.checked) {
         e.preventDefault();
@@ -823,20 +880,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      // Check for conditional redirect based on form answers
-      const businessTimeline = form.querySelector('input[name="business-timeline"]:checked');
-      const businessRevenue = form.querySelector('input[name="business-revenue"]:checked');
-      
-      const isLessThan4Months = businessTimeline && businessTimeline.value === 'Less than 4 months';
-      const isRevenue5000To15000 = businessRevenue && businessRevenue.value === '$5,000-$15,000';
-      
-      if (isLessThan4Months || isRevenue5000To15000) {
-        form.setAttribute('redirect', '/thank-you-under');
-        form.setAttribute('data-redirect', '/thank-you-under');
-      } else {
-        form.setAttribute('redirect', '/thank-you');
-        form.setAttribute('data-redirect', '/thank-you');
-      }
+      // Update redirect URL right before submission
+      updateRedirectUrl();
     });
   }
 
